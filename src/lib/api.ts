@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const getApiBaseUrl = (): string => {
   if (import.meta.env.PROD) return '/api';
-  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  return import.meta.env.VITE_API_URL || '/api';
 };
 
 const API = axios.create({
