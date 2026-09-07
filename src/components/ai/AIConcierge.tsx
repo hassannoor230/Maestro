@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, Sparkles, Clock, MapPin, Phone, Utensils, Calendar, ChevronDown } from 'lucide-react';
+import { X, Send, Bot, Sparkles, Clock, MapPin, Phone, Utensils, Calendar } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -30,13 +30,8 @@ export default function AIConcierge() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showActions, setShowActions] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

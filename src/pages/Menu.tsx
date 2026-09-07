@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getMenu } from '../lib/api';
 import { getMenuImage } from '../lib/images';
 
@@ -29,7 +29,6 @@ export default function Menu() {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,7 +43,6 @@ export default function Menu() {
   }, [filter, search]);
 
   const handleItemClick = (item: any) => {
-    setSelectedItem(item);
     const queryParams = new URLSearchParams({
       item: item.id,
       name: item.name,
