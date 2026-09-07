@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Bot, Sparkles, Clock, MapPin, Phone, Utensils, Calendar } from 'lucide-react';
+import API from '../../lib/api';
 
 interface Message {
   id: string;
@@ -79,19 +80,12 @@ How may I make your visit exceptional today?`,
 
   const handleAIResponse = async (userMessage: string) => {
     try {
-      const apiBaseUrl = import.meta.env.PROD
-        ? '/api'
-        : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
-      const response = await fetch(`${apiBaseUrl}/ai/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: userMessage,
-          sessionId: localStorage.getItem('ai_session_id') || Date.now().toString()
-        }),
+      const response = await API.post('/ai/chat', {
+        message: userMessage,
+        sessionId: localStorage.getItem('ai_session_id') || Date.now().toString()
       });
       
-      const data = await response.json();
+      const data = response.data;
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
