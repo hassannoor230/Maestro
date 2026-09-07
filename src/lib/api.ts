@@ -1,7 +1,24 @@
 import axios from 'axios';
 
+// Determine API base URL:
+// - Production (Vercel): use relative URL (same domain)
+// - Development: use localhost:5000
+const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    // In production on Vercel, use relative URLs
+    if (hostname === 'maestrobd-flax.vercel.app' || hostname.endsWith('.vercel.app')) {
+      return '/api';
+    }
+  }
+  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+};
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: getApiBaseUrl(),
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 export const getMenu = (params?: Record<string, string>) => API.get('/menu', { params });
