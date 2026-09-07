@@ -79,7 +79,10 @@ How may I make your visit exceptional today?`,
 
   const handleAIResponse = async (userMessage: string) => {
     try {
-      const response = await fetch('http://localhost:5000/api/ai/chat', {
+      const apiBaseUrl = import.meta.env.PROD
+        ? '/api'
+        : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+      const response = await fetch(`${apiBaseUrl}/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
