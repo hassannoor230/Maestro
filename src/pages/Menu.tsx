@@ -24,7 +24,6 @@ const categories = [
 
 export default function Menu() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [items, setItems] = useState<any[]>([]);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
