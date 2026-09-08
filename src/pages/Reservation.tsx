@@ -244,7 +244,7 @@ export default function Reservation() {
                 </button>
                 
                 {showDatePicker && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 sm:left-0 mt-2 z-50 glass-strong rounded-2xl p-4 w-[280px] sm:w-80 shadow-2xl animate-scale-in">
+                  <div className="relative mt-2 z-10 glass-strong rounded-2xl p-4 w-full max-w-sm shadow-2xl animate-scale-in">
                     <div className="flex items-center justify-between mb-4">
                       <button type="button" onClick={prevMonth} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                         <span className="text-champagne">◀</span>
@@ -309,7 +309,7 @@ export default function Reservation() {
                 </button>
 
                 {showTimePicker && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 sm:left-0 right-0 sm:right-auto mt-2 z-50 glass-strong rounded-2xl p-4 w-[280px] sm:w-80 shadow-2xl animate-scale-in max-h-64 sm:max-h-80 overflow-y-auto">
+                  <div className="relative mt-2 z-10 glass-strong rounded-2xl p-4 w-full max-w-sm shadow-2xl animate-scale-in max-h-64 sm:max-h-80 overflow-y-auto">
                     <div className="text-center mb-3">
                       <div className="inline-block w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 border-gold flex items-center justify-center">
                         <span className="text-gold text-xl sm:text-2xl">⏰</span>
