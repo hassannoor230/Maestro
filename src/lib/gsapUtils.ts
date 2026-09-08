@@ -158,9 +158,12 @@ export const staggerChildren = (
     return;
   }
 
-  gsap.from(targets, {
+  gsap.fromTo(targets, {
     opacity: 0,
     y: 30,
+  }, {
+    opacity: 1,
+    y: 0,
     duration: 0.8,
     delay: options?.delay ?? 0,
     stagger: options?.stagger ?? 0.1,

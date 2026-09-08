@@ -23,8 +23,8 @@ function AppContent() {
       if (mainRef.current) {
         gsap.fromTo(
           '.page-content',
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+          { y: 20 },
+          { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
         );
       }
     }, mainRef.current);

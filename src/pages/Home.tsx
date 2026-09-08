@@ -4,22 +4,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
 import { getSettings, getReviews } from '../lib/api';
 import foodImages from '../lib/images';
-import {
-  fadeInUp,
-  fadeInDown,
-  scaleIn,
-  staggerChildren,
-  parallaxHero,
-  floatingAnimation,
-  pulseGlow,
-  scrollReveal,
-} from '../lib/gsapUtils';
+import { scrollReveal, parallaxHero, floatingAnimation, pulseGlow } from '../lib/gsapUtils';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const [settings, setSettings] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const homeRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
   const heroOverlayRef = useRef<HTMLDivElement>(null);
@@ -29,28 +21,38 @@ export default function Home() {
     getReviews().then(r => setReviews(r.data)).catch(() => {});
 
     const ctx = gsap.context(() => {
-      fadeInDown('.hero-badge', { delay: 0.2 });
-      fadeInUp('.hero-title-line-1', { delay: 0.3 });
-      fadeInUp('.hero-title-line-2', { delay: 0.5 });
-      fadeInUp('.hero-subtitle', { delay: 0.7, duration: 0.8 });
-      staggerChildren('.hero-cta-group > *', { stagger: 0.2, delay: 0.9 });
-      scaleIn('.hero-image-wrapper', { delay: 0.6, duration: 0.8 });
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) {
+        gsap.set('.hero-badge, .hero-title-line-1, .hero-title-line-2, .hero-subtitle, .hero-cta-group > *, .hero-image-wrapper, .stat-card, .experience-item', { opacity: 1, y: 0, scale: 1 });
+        return;
+      }
 
-      staggerChildren('.stat-card', { stagger: 0.15, delay: 0.3, onComplete: () => {
-        const statCards = document.querySelectorAll('.stat-card');
-        statCards.forEach((card) => {
-          floatingAnimation(card);
-        });
-        const goldStat = document.querySelector('.stat-card .stat-num');
-        if (goldStat) {
-          pulseGlow(goldStat);
-        }
-      } });
+      const tl = gsap.timeline();
+      tl.fromTo('.hero-badge', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: 'power3.out' })
+        .fromTo('.hero-title-line-1', { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.3)
+        .fromTo('.hero-title-line-2', { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.5)
+        .fromTo('.hero-subtitle', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.7)
+        .fromTo('.hero-cta-group > *', { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.2, duration: 0.6, ease: 'power3.out' }, 0.9)
+        .fromTo('.hero-image-wrapper', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }, 0.6)
+        .fromTo('.stat-card', { 
+          opacity: 0, y: 30 
+        }, { 
+          opacity: 1, y: 0, stagger: 0.15, duration: 0.8, ease: 'power3.out',
+          onComplete: () => {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card) => {
+              floatingAnimation(card);
+            });
+            const goldStat = document.querySelector('.stat-card .stat-num');
+            if (goldStat) {
+              pulseGlow(goldStat);
+            }
+          }
+        }, 0.3)
+        .fromTo('.experience-item', { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.1, duration: 0.6, ease: 'power3.out' }, 0.2);
 
-      staggerChildren('.experience-item', { stagger: 0.1, delay: 0.2 });
-
-      scrollReveal('.food-gallery-item', { stagger: 0.1, y: 30 });
-    });
+      ScrollTrigger.refresh();
+    }, homeRef.current);
 
     return () => ctx.revert();
   }, []);
@@ -63,6 +65,10 @@ export default function Home() {
     if (heroImageRef.current) {
       floatingAnimation(heroImageRef.current);
     }
+  }, []);
+
+  useEffect(() => {
+    scrollReveal('.food-gallery-item', { stagger: 0.1, y: 30 });
   }, []);
 
   const stats = [
@@ -87,7 +93,7 @@ export default function Home() {
   ];
 
   return (
-    <div>
+    <div ref={homeRef}>
       {/* VIP Particles Background */}
       <div className="vip-particles">
         {[...Array(20)].map((_, i) => (
