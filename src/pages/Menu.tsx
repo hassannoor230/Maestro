@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -34,6 +34,7 @@ export default function Menu() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -48,24 +49,62 @@ export default function Menu() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
       fadeInDown('.menu-badge', { delay: 0.2 });
       fadeInUp('.menu-title', { delay: 0.3, duration: 0.8 });
       staggerChildren('.menu-search', { delay: 0.6 });
 
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!prefersReducedMotion) {
         staggerChildren('.category-btn', { stagger: 0.05, delay: 0.8 });
       }
-    });
+    }, menuRef);
 
     return () => ctx.revert();
   }, []);
 
   useEffect(() => {
-    if (items.length > 0) {
-      scrollReveal('.menu-card', { stagger: 0.1, y: 30 });
-    }
+    const ctx = gsap.context(() => {
+      if (items.length > 0) {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!prefersReducedMotion) {
+          scrollReveal('.menu-card', { stagger: 0.1, y: 30 });
+        } else {
+          gsap.set('.menu-card', { opacity: 1, y: 0 });
+        }
+      }
+    }, menuRef);
+
+    return () => ctx.revert();
   }, [items]);
+
+  const handleFilterChange = (categoryId: string) => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!prefersReducedMotion) {
+      const ctx = gsap.context(() => {
+        gsap.to('.menu-card', {
+          opacity: 0,
+          y: 20,
+          stagger: 0.03,
+          duration: 0.3,
+          onComplete: () => {
+            setFilter(categoryId);
+            setTimeout(() => {
+              const prefs = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+              if (!prefs) {
+                scrollReveal('.menu-card', { stagger: 0.1, y: 30 });
+              } else {
+                gsap.set('.menu-card', { opacity: 1, y: 0 });
+              }
+            }, 100);
+          }
+        });
+      }, menuRef);
+      return () => ctx.revert();
+    } else {
+      setFilter(categoryId);
+    }
+  };
 
   const handleItemClick = (item: any) => {
     const queryParams = new URLSearchParams({
@@ -77,7 +116,7 @@ export default function Menu() {
   };
 
   return (
-    <div className="pt-32 pb-20 min-h-screen">
+    <div className="pt-32 pb-20 min-h-screen" ref={menuRef}>
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <p className="menu-badge text-gold tracking-[0.3em] text-xs uppercase mb-3">Our Menu</p>
@@ -99,7 +138,7 @@ export default function Menu() {
           {categories.map(c => (
             <button
               key={c.id}
-              onClick={() => setFilter(c.id)}
+              onClick={() => handleFilterChange(c.id)}
               className={`category-btn px-4 py-2 rounded-full text-sm transition-all duration-300 border ${
                 filter === c.id
                   ? 'border-gold/50 text-gold bg-gold/10 scale-105'
