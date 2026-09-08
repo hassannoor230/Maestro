@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { createReservation } from '../lib/api';
 import foodImages from '../lib/images';
+import { fadeInUp, fadeInDown, staggerChildren, scaleIn } from '../lib/gsapUtils';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const timeSlots = [
   '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
@@ -29,8 +34,21 @@ export default function Reservation() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const dateRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const heroImageRef = useRef<HTMLDivElement>(null);
 
   const [calendarDate, setCalendarDate] = useState(new Date());
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      fadeInDown('.reservation-badge', { delay: 0.2 });
+      fadeInUp('.reservation-title', { delay: 0.3, duration: 0.8 });
+      staggerChildren('.form-section > *', { stagger: 0.1, delay: 0.4 });
+      scaleIn('.hero-image-sticky', { delay: 0.5, duration: 0.8 });
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   useEffect(() => {
     if (preselectedItem) {
@@ -58,6 +76,11 @@ export default function Reservation() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.date || !form.time || !form.guests || !form.name || !form.phone) {
+      setMessage('Please fill in all required fields: date, time, guests, name, and phone.');
+      setStatus('error');
+      return;
+    }
     setStatus('loading');
     try {
       const res = await createReservation({
@@ -73,7 +96,8 @@ export default function Reservation() {
       });
       setShowDeliveryForm(false);
     } catch (err: any) {
-      setMessage(err.response?.data?.message || 'Something went wrong');
+      const message = err.response?.data?.message || err.message || 'Something went wrong';
+      setMessage(message);
       setStatus('error');
     }
   };
@@ -126,7 +150,7 @@ export default function Reservation() {
   return (
     <div className="pt-32 pb-20 min-h-screen">
       <div className="max-w-6xl mx-auto px-4 grid lg:grid-cols-[0.8fr_1.2fr] gap-10 items-start">
-        <div className="hidden lg:block lg:sticky lg:top-28 rounded-2xl overflow-hidden border border-gold/20 animate-float">
+         <div ref={heroImageRef} className="hero-image-sticky hidden lg:block lg:sticky lg:top-28 rounded-2xl overflow-hidden border border-gold/20 animate-float">
           <img src={foodImages.restaurant} alt="Maestro Cafe interior" className="w-full aspect-[4/5] object-cover" />
           <div className="bg-surface px-6 py-5">
             <p className="font-serif text-2xl text-champagne">An evening worth remembering.</p>
@@ -136,12 +160,12 @@ export default function Reservation() {
 
         <div className="max-w-2xl w-full mx-auto">
           <div className="text-center mb-12">
-            <p className="text-gold tracking-[0.3em] text-xs uppercase mb-3 animate-pulse-slow">Reservations</p>
-            <h1 className="font-serif text-4xl sm:text-5xl animate-fade-in-up">YOUR TABLE AWAITS.</h1>
+             <p className="reservation-badge text-gold tracking-[0.3em] text-xs uppercase mb-3">Reservations</p>
+             <h1 className="reservation-title font-serif text-4xl sm:text-5xl">YOUR TABLE AWAITS.</h1>
           </div>
 
           {preselectedItem && (
-            <div className="glass rounded-2xl p-6 mb-6 border-gold/30 animate-scale-in">
+             <div className="glass rounded-2xl p-6 mb-6 border-gold/30 selected-item-wrapper">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-xl bg-gold/20 flex items-center justify-center">
                   <span className="text-3xl">🍽️</span>
@@ -155,7 +179,8 @@ export default function Reservation() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="glass-strong rounded-2xl p-8 md:p-10 space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="glass-strong rounded-2xl p-8 md:p-10 space-y-6">
+            <div className="form-section space-y-6">
             <div>
               <label className="block text-sm text-muted mb-3">Reservation Type</label>
               <div className="grid grid-cols-2 gap-4">
@@ -399,6 +424,7 @@ export default function Reservation() {
                 ? 'For delivery, please ensure your address is within our delivery area.'
                 : 'For dine-in, arrive 10 minutes before your reservation time.'}
             </p>
+            </div>
           </form>
         </div>
       </div>

@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { getMenu } from '../lib/api';
 import { getMenuImage } from '../lib/images';
+import { fadeInDown, fadeInUp, staggerChildren, scrollReveal } from '../lib/gsapUtils';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const categories = [
   { id: 'all', label: 'All' },
@@ -41,6 +46,27 @@ export default function Menu() {
       .finally(() => setLoading(false));
   }, [filter, search]);
 
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      fadeInDown('.menu-badge', { delay: 0.2 });
+      fadeInUp('.menu-title', { delay: 0.3, duration: 0.8 });
+      staggerChildren('.menu-search', { delay: 0.6 });
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!prefersReducedMotion) {
+        staggerChildren('.category-btn', { stagger: 0.05, delay: 0.8 });
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      scrollReveal('.menu-card', { stagger: 0.1, y: 30 });
+    }
+  }, [items]);
+
   const handleItemClick = (item: any) => {
     const queryParams = new URLSearchParams({
       item: item.id,
@@ -54,12 +80,12 @@ export default function Menu() {
     <div className="pt-32 pb-20 min-h-screen">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <p className="text-gold tracking-[0.3em] text-xs uppercase mb-3 animate-pulse-slow">Our Menu</p>
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl animate-fade-in-up">CULINARY ARTISTRY</h1>
+          <p className="menu-badge text-gold tracking-[0.3em] text-xs uppercase mb-3">Our Menu</p>
+          <h1 className="menu-title font-serif text-4xl sm:text-5xl lg:text-6xl">CULINARY ARTISTRY</h1>
           <p className="text-muted mt-4 max-w-lg mx-auto">Handcrafted dishes prepared with passion and the finest ingredients.</p>
         </div>
 
-        <div className="max-w-md mx-auto mb-8">
+        <div className="max-w-md mx-auto mb-8 menu-search">
           <input
             type="text"
             placeholder="Search menu..."
@@ -74,7 +100,7 @@ export default function Menu() {
             <button
               key={c.id}
               onClick={() => setFilter(c.id)}
-              className={`px-4 py-2 rounded-full text-sm transition-all duration-300 border ${
+              className={`category-btn px-4 py-2 rounded-full text-sm transition-all duration-300 border ${
                 filter === c.id
                   ? 'border-gold/50 text-gold bg-gold/10 scale-105'
                   : 'border-white/10 text-muted hover:border-gold/30 hover:text-gold hover:scale-105'
