@@ -150,10 +150,11 @@ export const pulseGlow = (target: string | Element, color = '#D4AF37') => {
 
 export const staggerChildren = (
   targets: string,
-  options?: { stagger?: number; delay?: number }
+  options?: { stagger?: number; delay?: number; onComplete?: () => void }
 ) => {
   if (prefersReducedMotion()) {
     gsap.set(targets, { opacity: 1, y: 0 });
+    options?.onComplete?.();
     return;
   }
 
@@ -164,5 +165,6 @@ export const staggerChildren = (
     delay: options?.delay ?? 0,
     stagger: options?.stagger ?? 0.1,
     ease: 'power3.out',
+    onComplete: options?.onComplete,
   });
 };

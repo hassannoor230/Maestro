@@ -29,24 +29,23 @@ export default function Home() {
     getReviews().then(r => setReviews(r.data)).catch(() => {});
 
     const ctx = gsap.context(() => {
-      if (heroRef.current) {
-        fadeInDown('.hero-badge', { delay: 0.2 });
-        fadeInUp('.hero-title-line-1', { delay: 0.3 });
-        fadeInUp('.hero-title-line-2', { delay: 0.5 });
-        fadeInUp('.hero-subtitle', { delay: 0.7, duration: 0.8 });
-        staggerChildren('.hero-cta-group > *', { stagger: 0.2, delay: 0.9 });
-        scaleIn('.hero-image-wrapper', { delay: 0.6, duration: 0.8 });
+      fadeInDown('.hero-badge', { delay: 0.2 });
+      fadeInUp('.hero-title-line-1', { delay: 0.3 });
+      fadeInUp('.hero-title-line-2', { delay: 0.5 });
+      fadeInUp('.hero-subtitle', { delay: 0.7, duration: 0.8 });
+      staggerChildren('.hero-cta-group > *', { stagger: 0.2, delay: 0.9 });
+      scaleIn('.hero-image-wrapper', { delay: 0.6, duration: 0.8 });
 
-        staggerChildren('.stat-card', { stagger: 0.15, delay: 0.3 });
+      staggerChildren('.stat-card', { stagger: 0.15, delay: 0.3, onComplete: () => {
         const statCards = document.querySelectorAll('.stat-card');
         statCards.forEach((card) => {
           floatingAnimation(card);
         });
         const goldStat = document.querySelector('.stat-card .stat-num');
-         if (goldStat) {
+        if (goldStat) {
           pulseGlow(goldStat);
         }
-      }
+      } });
 
       staggerChildren('.experience-item', { stagger: 0.1, delay: 0.2 });
 
