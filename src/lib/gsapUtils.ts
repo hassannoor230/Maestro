@@ -164,10 +164,5 @@ export const staggerChildren = (
     delay: options?.delay ?? 0,
     stagger: options?.stagger ?? 0.1,
     ease: 'power3.out',
-    scrollTrigger: {
-      trigger: targets,
-      start: 'top 85%',
-      toggleActions: 'play none none none',
-    },
   });
 };
