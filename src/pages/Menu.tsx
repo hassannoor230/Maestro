@@ -4,7 +4,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { getMenu } from '../lib/api';
 import { getMenuImage } from '../lib/images';
-import { fadeInDown, fadeInUp, staggerChildren, scrollReveal } from '../lib/gsapUtils';
+import { fadeInDown, fadeInUp, staggerChildren } from '../lib/gsapUtils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -68,7 +68,25 @@ export default function Menu() {
       if (items.length > 0) {
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (!prefersReducedMotion) {
-          scrollReveal('.menu-card', { stagger: 0.1, y: 30 });
+          const elements = document.querySelectorAll('.menu-card');
+          if (elements.length > 0) {
+            gsap.fromTo(elements, {
+              opacity: 0,
+              y: 30,
+            }, {
+              opacity: 1,
+              y: 0,
+              stagger: 0.1,
+              duration: 0.6,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: elements,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+              },
+            });
+            ScrollTrigger.refresh();
+          }
         } else {
           gsap.set('.menu-card', { opacity: 1, y: 0 });
         }
@@ -92,7 +110,19 @@ export default function Menu() {
             setTimeout(() => {
               const prefs = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
               if (!prefs) {
-                scrollReveal('.menu-card', { stagger: 0.1, y: 30 });
+                const elements = document.querySelectorAll('.menu-card');
+                if (elements.length > 0) {
+                  gsap.fromTo(elements, {
+                    opacity: 0,
+                    y: 30,
+                  }, {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.1,
+                    duration: 0.6,
+                    ease: 'power3.out',
+                  });
+                }
               } else {
                 gsap.set('.menu-card', { opacity: 1, y: 0 });
               }

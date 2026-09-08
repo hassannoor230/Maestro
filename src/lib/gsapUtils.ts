@@ -106,21 +106,27 @@ export const scrollReveal = (
     return;
   }
 
-  const elements = document.querySelectorAll(targets);
-  gsap.from(elements, {
+  gsap.fromTo(targets, {
     opacity: 0,
     y: options?.y ?? 50,
     x: options?.x ?? 0,
     scale: options?.scale ?? 1,
+  }, {
+    opacity: 1,
+    y: 0,
+    x: 0,
+    scale: 1,
     duration: options?.duration ?? 0.8,
     stagger: options?.stagger ?? 0,
     ease: 'power2.out',
     scrollTrigger: {
-      trigger: elements,
+      trigger: targets,
       start: 'top 85%',
       toggleActions: 'play none none none',
     },
   });
+
+  ScrollTrigger.refresh();
 };
 
 export const floatingAnimation = (target: string | Element) => {
