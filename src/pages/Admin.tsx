@@ -501,13 +501,30 @@ export default function Admin() {
       <div className={`flex-1 min-w-0 transition-all duration-300 ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-20'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center mb-6 sm:mb-8 py-4">
-            <h1 className="font-serif text-2xl sm:text-3xl text-champagne capitalize">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden p-2.5 rounded-xl border border-gold/30 text-gold hover:bg-gold/10 transition-colors"
+                aria-label={sidebarOpen ? 'Close admin sidebar' : 'Open admin sidebar'}
+                aria-expanded={sidebarOpen}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  {sidebarOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+              <h1 className="font-serif text-2xl sm:text-3xl text-champagne capitalize">
               {activeTab === 'dashboard' ? 'Dashboard' : 
                activeTab === 'menu' ? 'Menu Management' :
                activeTab === 'reservations' ? 'Reservations' :
                activeTab === 'reviews' ? 'Reviews' :
                activeTab === 'messages' ? 'Messages' : 'Settings'}
-            </h1>
+              </h1>
+            </div>
           </div>
 
           {/* Dashboard */}
